@@ -13,7 +13,7 @@ output being generated.
 
 To install the library and command line program, use the following:
 
-	go get -u github.com/twitter/go-bindata/...
+	go get -u github.com/whosonfirst/go-bindata/...
 
 
 ### Usage
