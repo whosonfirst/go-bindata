@@ -10,10 +10,41 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
-
 	"github.com/whosonfirst/go-bindata"
 )
+
+const (
+	AppName         = "go-bindata"
+	AppVersionMajor = 3
+	AppVersionMinor = 1
+)
+
+// revision part of the program version.
+// This will be set automatically at build time like so:
+//
+//     go build -ldflags "-X main.AppVersionRev `date -u +%s`"
+var AppVersionRev string
+
+// borrowed from https://github.com/hashicorp/serf/blob/master/command/agent/flag_slice_value.go
+
+// AppendSliceValue implements the flag.Value interface and allows multiple
+// calls to the same variable to append a list.
+type AppendSliceValue []string
+
+func (s *AppendSliceValue) String() string {
+	return strings.Join(*s, ",")
+}
+
+func (s *AppendSliceValue) Set(value string) error {
+	if *s == nil {
+		*s = make([]string, 0, 1)
+	}
+
+	*s = append(*s, value)
+	return nil
+}
 
 func main() {
 	cfg := parseArgs()
@@ -104,4 +135,14 @@ func parseInput(path string) bindata.InputConfig {
 		}
 	}
 
+}
+
+
+func Version() string {
+	if len(AppVersionRev) == 0 {
+		AppVersionRev = "0"
+	}
+
+	return fmt.Sprintf("%s %d.%d.%s (Go runtime %s).\nCopyright (c) 2010-2013, Jim Teeuwen.",
+		AppName, AppVersionMajor, AppVersionMinor, AppVersionRev, runtime.Version())
 }
